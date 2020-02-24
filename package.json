@@ -1,0 +1,25 @@
+{
+  "name": "jarvis",
+  "version": "2.0.0",
+  "description": "simple discord bot in nodejs",
+  "main": "bot.js",
+  "scripts": {
+    "test": "nodejs bot.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "roo@144.91.88.38:git/JARVIS"
+  },
+  "keywords": [
+    "discord",
+    "bot",
+    "music"
+  ],
+  "author": "Filip Bacinger",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^11.5.1",
+    "node-opus": "^0.3.3",
+    "ytdl-core": "^2.0.0"
+  }
+}

@@ -1,14 +1,41 @@
+const fs = require('fs');
 const Discord = require('discord.js');
-const client = new Discord.Client();
+const bot = new Discord.Client();
+bot.commands = new Discord.Collection();
+bot.config = require('./config.json');
+bot.music = {};
 
-client.on('ready', () => {
-    console.log(`Logged in as ${client.user.tag}!`);
+// read and set up commands
+const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+for (const file of commandFiles) {
+    const command = require(`./commands/${file}`);
+    bot.commands.set(command.name, command);
+}
+
+bot.on('ready', () => {
+    console.log(`Logged in as ${bot.user.tag}!`);
 });
 
-client.on('message', msg => {
-    if (msg.content === 'ping') {
-        msg.reply('pong');
+bot.on('message', msg => {
+    if (!msg.content.startsWith(bot.config.prefix) || msg.author.bot) {
+        // ignore messages without command prefix and from bots
+        return;
+    }
+
+    const args = msg.content.slice(bot.config.prefix.length).split(/ +/); // temp solution, add suppot for ""
+    const command = args.shift().toLowerCase();
+
+    if (!bot.commands.has(command)) {
+        const sentMessage = await msg.channel.send(`Unkown command. Try ${bot.config.prefix}help`);
+        return;
+    }
+
+    try {
+        bot.commands.get(command).execute(msg, args);
+    } catch (error) {
+        console.error(error);
+        const sentMessage = await msg.channel.send(`There was an error trying to execute "${msg.content}"`);
     }
 });
 
-client.login('token');
+bot.login(bot.config.token);

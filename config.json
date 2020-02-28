@@ -1,0 +1,6 @@
+{
+    "token": "s",
+    "prefix": "!",
+    "voiceTimeout": 30,
+    "messageDeleteTimeout": 3
+}

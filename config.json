@@ -1,6 +1,7 @@
 {
     "token": "s",
     "prefix": "!",
+    "ytApiKey": "y",
     "voiceTimeout": 30,
     "messageDeleteTimeout": 3
 }

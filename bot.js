@@ -3,7 +3,11 @@ const Discord = require('discord.js');
 const bot = new Discord.Client();
 bot.commands = new Discord.Collection();
 bot.config = require('./config.json');
-bot.music = {};
+bot.activeConnection = null;
+bot.music = {
+    dispatcher: null,
+    queue: []
+};
 
 // read and set up commands
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
@@ -26,7 +30,7 @@ bot.on('message', msg => {
     const command = args.shift().toLowerCase();
 
     if (!bot.commands.has(command)) {
-        const sentMessage = await msg.channel.send(`Unkown command. Try ${bot.config.prefix}help`);
+        msg.channel.send(`Unknown command. Try ${bot.config.prefix}help`);
         return;
     }
 
@@ -34,7 +38,7 @@ bot.on('message', msg => {
         bot.commands.get(command).execute(msg, args);
     } catch (error) {
         console.error(error);
-        const sentMessage = await msg.channel.send(`There was an error trying to execute "${msg.content}"`);
+        msg.channel.send(`There was an error trying to execute "${msg.content}"`);
     }
 });
 

@@ -1,6 +1,7 @@
 const fs = require('fs');
 const Discord = require('discord.js');
 const bot = new Discord.Client();
+
 bot.commands = new Discord.Collection();
 bot.config = require('./config.json');
 bot.activeConnection = null;
@@ -8,6 +9,9 @@ bot.music = {
     dispatcher: null,
     queue: []
 };
+bot.timeouts = {
+    disconnect: null
+}
 
 // read and set up commands
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));

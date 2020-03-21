@@ -48,7 +48,7 @@ module.exports = {
         bot.music.queue.push({name:trackInfo.title, url:url});
         if (bot.music.dispatcher === null) {
             // start audio playback
-            bot.music.dispatcher = bot.activeConnection.playStream(ytdl(url, {quality:"highestaudio", filter:"audioonly"}));
+            bot.music.dispatcher = bot.activeConnection.playStream(ytdl(url, {quality:"highestaudio", filter:"audioonly", highWaterMark: 1<<25}));
             bot.music.dispatcher.on("end", function() {endOfTrack(bot);});
         }
     }
@@ -58,7 +58,7 @@ function endOfTrack(bot) {
     bot.music.queue.shift(); // remove current track from queue
     if (bot.music.queue.length > 0) {
         delete bot.music.dispatcher;
-        bot.music.dispatcher = bot.activeConnection.playStream(ytdl(bot.music.queue[0].url, {quality:"highestaudio", filter:"audioonly"}));
+        bot.music.dispatcher = bot.activeConnection.playStream(ytdl(bot.music.queue[0].url, {quality:"highestaudio", filter:"audioonly", highWaterMark: 1<<25}));
         bot.music.dispatcher.on("end", function() {endOfTrack(bot);});
     } else {
         // queue is empty

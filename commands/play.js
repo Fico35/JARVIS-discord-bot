@@ -66,6 +66,7 @@ function endOfTrack(bot) {
         // set timer to disconnect
         bot.timeouts.disconnect = setTimeout(function() {
             bot.activeConnection.disconnect();
+            delete bot.activeConnection;
             bot.activeConnection = null;
             bot.timeouts.disconnect = null;
         }, bot.config.voiceTimeout);

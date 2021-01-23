@@ -5,7 +5,7 @@ module.exports = {
     name: 'play',
     description: 'Plays a You Tube video.',
     async execute(msg, args) {
-        if (!msg.member.voiceChannel) {
+        if (!msg.member.voice || !msg.member.voice.channel) {
             // user who sent message is not in a voice channel
             msg.channel.send(`You need to join a voice channel first!`);
             return;
@@ -34,7 +34,7 @@ module.exports = {
         // video exists and link is valid
         if (bot.activeConnection === null) {
             // bot is not connected to any channel
-            bot.activeConnection = await msg.member.voiceChannel.join().catch(console.error);
+            bot.activeConnection = await msg.member.voice.channel.join().catch(console.error);
         } else {
             // bot is connected to a channel
             if (bot.timeouts.disconnect != null) {
@@ -45,12 +45,12 @@ module.exports = {
         }
         const trackInfo = await ytdl.getBasicInfo(url).catch(console.error);    // get track info
         // save track to queue
-        bot.music.queue.push({name:trackInfo.title, url:url});
+        bot.music.queue.push({name:trackInfo.videoDetails.title, url:url});
         if (bot.music.dispatcher === null) {
             // start audio playback
-            bot.music.dispatcher = bot.activeConnection.playStream(ytdl(url, {quality:"highestaudio", filter:"audioonly", highWaterMark: 1<<25}));
-            bot.user.setActivity(trackInfo.title);
-            bot.music.dispatcher.on("end", function() {endOfTrack(bot);});
+            bot.music.dispatcher = bot.activeConnection.play(ytdl(url, {quality:"highestaudio", filter:"audioonly", highWaterMark: 1<<25}));
+            bot.user.setActivity(trackInfo.videoDetails.title);
+            bot.music.dispatcher.on("finish", function() {endOfTrack(bot);});
         }
     }
 }
@@ -59,9 +59,9 @@ function endOfTrack(bot) {
     bot.music.queue.shift(); // remove current track from queue
     if (bot.music.queue.length > 0) {
         delete bot.music.dispatcher;
-        bot.music.dispatcher = bot.activeConnection.playStream(ytdl(bot.music.queue[0].url, {quality:"highestaudio", filter:"audioonly", highWaterMark: 1<<25}));
+        bot.music.dispatcher = bot.activeConnection.play(ytdl(bot.music.queue[0].url, {quality:"highestaudio", filter:"audioonly", highWaterMark: 1<<25}));
         bot.user.setActivity(bot.music.queue[0].name);
-        bot.music.dispatcher.on("end", function() {endOfTrack(bot);});
+        bot.music.dispatcher.on("finish", function() {endOfTrack(bot);});
     } else {
         // queue is empty
         bot.music.dispatcher = null;
